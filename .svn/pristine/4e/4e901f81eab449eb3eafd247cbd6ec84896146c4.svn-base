@@ -1,0 +1,486 @@
+### BEG # TEST 1 ###
+---------------
+print 10+9
+vvvvvvvvvvvvvvv
+print (10 + 9)
+
+---------------
+print 10-9
+vvvvvvvvvvvvvvv
+print (10 - 9)
+
+---------------
+print 10+9+8
+vvvvvvvvvvvvvvv
+print ((10 + 9) + 8)
+
+---------------
+print 10-9-8
+vvvvvvvvvvvvvvv
+print ((10 - 9) - 8)
+
+---------------
+print length+length
+vvvvvvvvvvvvvvv
+print (length + length)
+
+---------------
+print length-length
+vvvvvvvvvvvvvvv
+print (length - length)
+
+---------------
+print foo+foo
+vvvvvvvvvvvvvvv
+print (foo + foo)
+
+---------------
+print foo+(foo)
+vvvvvvvvvvvvvvv
+print (foo + foo)
+
+---------------
+print 10+9+x*length-foo+array
+vvvvvvvvvvvvvvv
+print ((((10 + 9) + (x * length)) - foo) + array)
+
+---------------
+print (a-b)*(a+b)
+vvvvvvvvvvvvvvv
+print ((a - b) * (a + b))
+
+### END # TEST 1 ###
+### BEG # TEST 2 ###
+---------------
+print !x
+vvvvvvvvvvvvvvv
+print !x
+
+---------------
+print !!!!!!x
+vvvvvvvvvvvvvvv
+print !!!!!!x
+
+### END # TEST 2 ###
+### BEG # TEST 3 ###
+---------------
+print 10<9
+vvvvvvvvvvvvvvv
+print (10 < 9)
+
+---------------
+print 10+a*3<9-4+2
+vvvvvvvvvvvvvvv
+print ((10 + (a * 3)) < ((9 - 4) + 2))
+
+---------------
+print length<1
+vvvvvvvvvvvvvvv
+print (length < 1)
+
+---------------
+print i<foo
+vvvvvvvvvvvvvvv
+print (i < foo)
+
+---------------
+print 10<9
+vvvvvvvvvvvvvvv
+print (10 < 9)
+
+---------------
+print 10+a*3<9-4+2
+vvvvvvvvvvvvvvv
+print ((10 + (a * 3)) < ((9 - 4) + 2))
+
+---------------
+print length<1
+vvvvvvvvvvvvvvv
+print (length < 1)
+
+---------------
+print i<foo
+vvvvvvvvvvvvvvv
+print (i < foo)
+
+### END # TEST 3 ###
+### BEG # TEST 4 ###
+---------------
+print 10*9
+vvvvvvvvvvvvvvv
+print (10 * 9)
+
+---------------
+print 10*9*8
+vvvvvvvvvvvvvvv
+print ((10 * 9) * 8)
+
+---------------
+print foo*length
+vvvvvvvvvvvvvvv
+print (foo * length)
+
+---------------
+print 10*9*8*7*x*y*foo
+vvvvvvvvvvvvvvv
+print ((((((10 * 9) * 8) * 7) * x) * y) * foo)
+
+### END # TEST 4 ###
+### BEG # TEST 5 ###
+---------------
+print this
+vvvvvvvvvvvvvvv
+print this
+
+### END # TEST 5 ###
+### BEG # TEST 6 ###
+---------------
+File: sample/aaa.exp
+vvvvvvvvvvvvvvv
+i0 = 0;
+i1 = 1;
+i2 = (i1 + i0);
+i3 = (i2 + i1);
+i4 = (i3 + i2);
+i5 = (i4 + i3);
+i6 = (i5 + i4);
+i7 = (i6 + i5);
+i8 = (i7 + i6);
+i9 = (i8 + i7);
+i10 = (i9 + i8);
+i11 = (i10 + i9);
+i12 = (i11 + i10);
+i13 = (i12 + i11);
+i14 = (i13 + i12);
+i15 = (i14 + i13);
+total = (((((((((((((((i15 + i14) + i13) + i12) + i11) + i10) + i9) + i8) + i7) + i6) + i5) + i4) + i3) + i2) + i1) + i0);
+print total
+
+---------------
+File: sample/bigcond.exp
+vvvvvvvvvvvvvvv
+this = ( (1 < 2) ? ( (3 < 4) ? 5 : ( (6 < 7) ? 8 : 9 ) ) : ( (10 < 11) ? 12 : 13 ) );
+print this
+
+---------------
+File: sample/cond.exp
+vvvvvvvvvvvvvvv
+l = 5;
+r = 8;
+print ( (l < r) ? 10 : 20 )
+
+---------------
+File: sample/fib.exp
+vvvvvvvvvvvvvvv
+zero = 0;
+one = 1;
+two = (one + zero);
+three = (two + one);
+four = (three + two);
+five = (four + three);
+print five
+
+---------------
+File: sample/less.exp
+vvvvvvvvvvvvvvv
+l = 5;
+r = 8;
+less = (l < r);
+print less
+
+---------------
+File: sample/not.exp
+vvvvvvvvvvvvvvv
+less = (1 < 2);
+more = !less;
+print more
+
+---------------
+File: sample/year.exp
+vvvvvvvvvvvvvvv
+y = 2011;
+print (y + 1)
+
+### END # TEST 6 ###
+### BEG # TEST 7 ###
+---------------
+print 1
+vvvvvvvvvvvvvvv
+print 1
+
+### END # TEST 7 ###
+### BEG # TEST 8 ###
+---------------
+print 10<9?x:y
+vvvvvvvvvvvvvvv
+print ( (10 < 9) ? x : y )
+
+---------------
+print 10+a*3<9-4+2 ? 3 + 4 : 5 * 7
+vvvvvvvvvvvvvvv
+print ( ((10 + (a * 3)) < ((9 - 4) + 2)) ? (3 + 4) : (5 * 7) )
+
+---------------
+print 1 ? 2 ? 3 ? 4 : 5 : 6 : 7
+vvvvvvvvvvvvvvv
+print ( 1 ? ( 2 ? ( 3 ? 4 : 5 ) : 6 ) : 7 )
+
+---------------
+print 1 ? 2 ? 3 : 4 ? 5 : 6 : 7 ? 8 : 9
+vvvvvvvvvvvvvvv
+print ( 1 ? ( 2 ? 3 : ( 4 ? 5 : 6 ) ) : ( 7 ? 8 : 9 ) )
+
+### END # TEST 8 ###
+### BEG # TEST 9 ###
+---------------
+print call()
+vvvvvvvvvvvvvvv
+print call()
+
+---------------
+print call(1)
+vvvvvvvvvvvvvvv
+print call(1)
+
+---------------
+print call(id)
+vvvvvvvvvvvvvvv
+print call(id)
+
+---------------
+print call(1, 2)
+vvvvvvvvvvvvvvv
+print call(12)
+
+---------------
+print call(1, 2, 4)
+vvvvvvvvvvvvvvv
+print call(124)
+
+---------------
+print call (1)
+vvvvvvvvvvvvvvv
+print call(1)
+
+---------------
+print cal9 (1)
+vvvvvvvvvvvvvvv
+print cal9(1)
+
+---------------
+print (1, 2)
+Expected parsing failure
+---------------
+print 9cal(1)
+Expected parsing failure
+---------------
+print call(1,2
+Expected parsing failure
+---------------
+print call1,2)
+Expected parsing failure
+---------------
+print 1, 2
+Expected parsing failure
+---------------
+print call(1,2,)
+Expected parsing failure
+---------------
+print call(,1,2)
+Expected parsing failure
+---------------
+print call(,)
+Expected parsing failure
+---------------
+print call(
+Expected parsing failure
+---------------
+print call)
+Expected parsing failure
+### END # TEST 9 ###
+### BEG # TEST 10 ###
+---------------
+numbers = numbers + 1;
+print 1
+vvvvvvvvvvvvvvv
+numbers = (numbers + 1);
+print 1
+
+---------------
+foo = foo+1;
+print 1
+vvvvvvvvvvvvvvv
+foo = (foo + 1);
+print 1
+
+### END # TEST 10 ###
+### BEG # TEST 11 ###
+---------------
+int add(int a, int b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a, int b) {
+return a + b;
+}
+
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a) { return a; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a) {
+   return a;
+}
+print 1
+
+---------------
+int id(boolean a) { return a; }
+print 1
+vvvvvvvvvvvvvvv
+int id(boolean a) {
+   return a;
+}
+print 1
+
+---------------
+int add(int a, boolean b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, boolean b) {
+   return (a + b);
+}
+print 1
+
+---------------
+boolean add(int a, int b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+boolean add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a, int b) { foo = foo+1; return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   foo = (foo + 1);
+   return (a + b);
+}
+print 1
+
+---------------
+int fib(int n) { return (n < 2) ? 1 : (fib(n-1) + fib(n-2)); }
+print 1
+vvvvvvvvvvvvvvv
+int fib(int n) {
+   return ( (n < 2) ? 1 : (fib((n - 1)) + fib((n - 2))) );
+}
+print 1
+
+---------------
+int random(){ return 4; }
+print 1
+vvvvvvvvvvvvvvv
+int random() {
+   return 4;
+}
+print 1
+
+---------------
+foo a(){ return 1; }
+print 1
+Expected parsing failure
+---------------
+int a(, bool id){ return 1; }
+print 1
+Expected parsing failure
+---------------
+int 9a(){return 1;}
+print 1
+Expected parsing failure
+---------------
+a(){return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun({return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun){return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun(){return 1;
+print 1
+Expected parsing failure
+---------------
+int fun()return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun(int a)
+print 1
+Expected parsing failure
+---------------
+int fun(int a){}
+print 1
+Expected parsing failure
+---------------
+int fun(int a){ a = a + 5; }
+print 1
+Expected parsing failure
+### END # TEST 11 ###
+### BEG # TEST 12 ###
+---------------
+print (1)
+vvvvvvvvvvvvvvv
+print 1
+
+---------------
+print ((((((1))))))
+vvvvvvvvvvvvvvv
+print 1
+
+### END # TEST 12 ###
+### BEG # TEST 13 ###
+---------------
+print x
+vvvvvvvvvvvvvvv
+print x
+
+---------------
+print y
+vvvvvvvvvvvvvvv
+print y
+
+---------------
+print xy123
+vvvvvvvvvvvvvvv
+print xy123
+
+---------------
+print x_y_123
+vvvvvvvvvvvvvvv
+print x_y_123
+
+---------------
+print x_y_123
+vvvvvvvvvvvvvvv
+print x_y_123
+
+### END # TEST 13 ###
