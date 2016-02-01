@@ -19,74 +19,71 @@ import ast.Program;
 import ast.Times;
 import ast.UnknownType;
 import typechecker.ErrorReport;
-import util.FunTable;
+import util.ImpTable;
+import util.ImpTable.DuplicateException;
 import visitor.Visitor;
 
-public class BuildFunctionTableVisitor implements Visitor<FunTable<FunctionDeclaration>> {
+public class BuildFunctionTableVisitor implements Visitor<ImpTable<FunctionDeclaration>> {
 
-	private FunTable<FunctionDeclaration> declarations;
+	private ImpTable<FunctionDeclaration> declarations;
 	private ErrorReport errors;
 	
 	public BuildFunctionTableVisitor(ErrorReport errors){
 		this.errors = errors;
-		declarations = FunTable.<FunctionDeclaration>theEmpty();
+		declarations = new ImpTable<FunctionDeclaration>();
 	}
 	
 	@Override
-	public <T extends AST> FunTable<FunctionDeclaration> visit(NodeList<T> ns) {
+	public <T extends AST> ImpTable<FunctionDeclaration> visit(NodeList<T> ns) {
 		for (int i = 0; i < ns.size(); i++)
 			ns.elementAt(i).accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Program n) {
+	public ImpTable<FunctionDeclaration> visit(Program n) {
 		n.statements.accept(this);
 		n.print.accept(this);
 		return declarations;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Print n) {
+	public ImpTable<FunctionDeclaration> visit(Print n) {
 		n.exp.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Assign n) {
+	public ImpTable<FunctionDeclaration> visit(Assign n) {
 		n.value.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(FunctionDeclaration decl) {		
-		// if this is a valid declaration, look at body to check everything is defined
-		if(add(decl)) {
+	public ImpTable<FunctionDeclaration> visit(FunctionDeclaration decl) {		
+		try {
+			declarations.put(decl.name, decl);
+			
+			// if this is a valid declaration, look at body to check everything is defined
 			decl.body.accept(this);
 			decl.returnExpression.accept(this);
 		}
-		return null;
-	}
-
-	public boolean add(FunctionDeclaration decl) {
-		if(declarations.lookup(decl.name) != null) {
+		catch(DuplicateException de) {
 			errors.duplicateDefinition(decl.name);
-			return false;
 		}
 		
-		declarations.merge(declarations.insert(decl.name, decl));	
-		return true;
+		return null;
 	}
 	
 	@Override
-	public FunTable<FunctionDeclaration> visit(LessThan n) {
+	public ImpTable<FunctionDeclaration> visit(LessThan n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Conditional n) {
+	public ImpTable<FunctionDeclaration> visit(Conditional n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 		n.e3.accept(this);
@@ -94,59 +91,59 @@ public class BuildFunctionTableVisitor implements Visitor<FunTable<FunctionDecla
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Plus n) {
+	public ImpTable<FunctionDeclaration> visit(Plus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Minus n) {
+	public ImpTable<FunctionDeclaration> visit(Minus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Times n) {
+	public ImpTable<FunctionDeclaration> visit(Times n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(IntegerLiteral n) {
+	public ImpTable<FunctionDeclaration> visit(IntegerLiteral n) {
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(IdentifierExp n) {
+	public ImpTable<FunctionDeclaration> visit(IdentifierExp n) {
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(Not not) {
+	public ImpTable<FunctionDeclaration> visit(Not not) {
 		not.e.accept(this);
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(IntegerType n) {
+	public ImpTable<FunctionDeclaration> visit(IntegerType n) {
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(BooleanType n) {
+	public ImpTable<FunctionDeclaration> visit(BooleanType n) {
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(UnknownType n) {
+	public ImpTable<FunctionDeclaration> visit(UnknownType n) {
 		return null;
 	}
 
 	@Override
-	public FunTable<FunctionDeclaration> visit(FunctionInvocation call) {
+	public ImpTable<FunctionDeclaration> visit(FunctionInvocation call) {
 		if(declarations.lookup(call.name) == null)
 			errors.undefinedId(call.name);
 		return null;

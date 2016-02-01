@@ -233,6 +233,73 @@ print ( 1 ? ( 2 ? 3 : ( 4 ? 5 : 6 ) ) : ( 7 ? 8 : 9 ) )
 ### END # TEST 8 ###
 ### BEG # TEST 9 ###
 ---------------
+print call()
+vvvvvvvvvvvvvvv
+print call()
+
+---------------
+print call(1)
+vvvvvvvvvvvvvvv
+print call(1)
+
+---------------
+print call(id)
+vvvvvvvvvvvvvvv
+print call(id)
+
+---------------
+print call(1, 2)
+vvvvvvvvvvvvvvv
+print call(12)
+
+---------------
+print call(1, 2, 4)
+vvvvvvvvvvvvvvv
+print call(124)
+
+---------------
+print call (1)
+vvvvvvvvvvvvvvv
+print call(1)
+
+---------------
+print cal9 (1)
+vvvvvvvvvvvvvvv
+print cal9(1)
+
+---------------
+print (1, 2)
+Expected parsing failure
+---------------
+print 9cal(1)
+Expected parsing failure
+---------------
+print call(1,2
+Expected parsing failure
+---------------
+print call1,2)
+Expected parsing failure
+---------------
+print 1, 2
+Expected parsing failure
+---------------
+print call(1,2,)
+Expected parsing failure
+---------------
+print call(,1,2)
+Expected parsing failure
+---------------
+print call(,)
+Expected parsing failure
+---------------
+print call(
+Expected parsing failure
+---------------
+print call)
+Expected parsing failure
+### END # TEST 9 ###
+### BEG # TEST 10 ###
+---------------
 numbers = numbers + 1;
 print 1
 vvvvvvvvvvvvvvv
@@ -246,8 +313,139 @@ vvvvvvvvvvvvvvv
 foo = (foo + 1);
 print 1
 
-### END # TEST 9 ###
-### BEG # TEST 10 ###
+### END # TEST 10 ###
+### BEG # TEST 11 ###
+---------------
+int add(int a, int b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a, int b) {
+return a + b;
+}
+
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a) { return a; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a) {
+   return a;
+}
+print 1
+
+---------------
+int id(boolean a) { return a; }
+print 1
+vvvvvvvvvvvvvvv
+int id(boolean a) {
+   return a;
+}
+print 1
+
+---------------
+int add(int a, boolean b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, boolean b) {
+   return (a + b);
+}
+print 1
+
+---------------
+boolean add(int a, int b) { return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+boolean add(int a, int b) {
+   return (a + b);
+}
+print 1
+
+---------------
+int add(int a, int b) { foo = foo+1; return a + b; }
+print 1
+vvvvvvvvvvvvvvv
+int add(int a, int b) {
+   foo = (foo + 1);
+   return (a + b);
+}
+print 1
+
+---------------
+int fib(int n) { return (n < 2) ? 1 : (fib(n-1) + fib(n-2)); }
+print 1
+vvvvvvvvvvvvvvv
+int fib(int n) {
+   return ( (n < 2) ? 1 : (fib((n - 1)) + fib((n - 2))) );
+}
+print 1
+
+---------------
+int random(){ return 4; }
+print 1
+vvvvvvvvvvvvvvv
+int random() {
+   return 4;
+}
+print 1
+
+---------------
+foo a(){ return 1; }
+print 1
+Expected parsing failure
+---------------
+int a(, bool id){ return 1; }
+print 1
+Expected parsing failure
+---------------
+int 9a(){return 1;}
+print 1
+Expected parsing failure
+---------------
+a(){return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun({return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun){return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun(){return 1;
+print 1
+Expected parsing failure
+---------------
+int fun()return 1;}
+print 1
+Expected parsing failure
+---------------
+int fun(int a)
+print 1
+Expected parsing failure
+---------------
+int fun(int a){}
+print 1
+Expected parsing failure
+---------------
+int fun(int a){ a = a + 5; }
+print 1
+Expected parsing failure
+### END # TEST 11 ###
+### BEG # TEST 12 ###
 ---------------
 print (1)
 vvvvvvvvvvvvvvv
@@ -258,8 +456,8 @@ print ((((((1))))))
 vvvvvvvvvvvvvvv
 print 1
 
-### END # TEST 10 ###
-### BEG # TEST 11 ###
+### END # TEST 12 ###
+### BEG # TEST 13 ###
 ---------------
 print x
 vvvvvvvvvvvvvvv
@@ -285,4 +483,4 @@ print x_y_123
 vvvvvvvvvvvvvvv
 print x_y_123
 
-### END # TEST 11 ###
+### END # TEST 13 ###

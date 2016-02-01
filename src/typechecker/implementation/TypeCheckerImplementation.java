@@ -26,7 +26,7 @@ public class TypeCheckerImplementation extends TypeChecked {
 	 * The symbol table computed by phase 1:
 	 */
 	private ImpTable<Type> variables;
-	private FunTable<FunctionDeclaration> functions;
+	private ImpTable<FunctionDeclaration> functions;
 
 	public TypeCheckerImplementation(Program program) {
 		this.program = program;

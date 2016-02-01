@@ -161,7 +161,7 @@ public class BuildSymbolTableVisitor extends DefaultVisitor<ImpTable<Type>> {
 		
 		for(Parameter p :decl.parameters) {
 			// doesn't matter if parameter was shadowed
-			variables.set(p.name, null);
+			variables.clear(p.name);
 		}	
 		
 		return null;

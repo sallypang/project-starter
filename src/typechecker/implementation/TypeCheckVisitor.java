@@ -57,10 +57,10 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	 * The symbol table from Phase 1. 
 	 */
 	private ImpTable<Type> variables;
-	private FunTable<FunctionDeclaration> functions;
+	private ImpTable<FunctionDeclaration> functions;
 
 
-	public TypeCheckVisitor(ImpTable<Type> variables, FunTable<FunctionDeclaration> functions, ErrorReport errors) {
+	public TypeCheckVisitor(ImpTable<Type> variables, ImpTable<FunctionDeclaration> functions, ErrorReport errors) {
 		this.variables = variables;
 		this.errors = errors;
 		this.functions = functions;
@@ -219,11 +219,10 @@ public class TypeCheckVisitor implements Visitor<Type> {
 		}
 		
 		decl.body.accept(this);
-		decl.returnExpression.accept(this);
+		check(decl.returnExpression, decl.returnType);
 		
 		for(Parameter p :decl.parameters) {
-			// doesn't matter if parameter was shadowed
-			variables.set(p.name, null);
+			variables.clear(p.name);
 		}
 				
 		return null;

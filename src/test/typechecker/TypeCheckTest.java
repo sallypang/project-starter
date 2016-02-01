@@ -130,6 +130,86 @@ public class TypeCheckTest {
 		expect( typeError("i", new BooleanType(), new IntegerType()),
 				progWithExp("!i") );
 	}
+	
+	@Test public void badFunctionDeclaration() throws Exception {
+		expect( typeError("1 < 2", new IntegerType(), new BooleanType()),
+				progWithFunction("int x() { return 1 < 2; }"));
+		expect( typeError("1", new BooleanType(), new IntegerType()),
+				progWithFunction("boolean x() { return 1; }"));
+	}
+	
+	@Test public void goodFunctionDeclaration() throws Exception {
+		accept(progWithFunction("int x() { return 1; }"));
+		accept(progWithFunction("boolean x() { return 1 < 2; }"));
+		accept(progWithFunction("int x(int x) { return x+1; }"));
+		accept(progWithFunction("boolean x(int x) { return x < 1; }"));
+		accept(progWithFunction("int x(int x, int y) { return x + y; }"));
+		accept(progWithFunction("boolean x(int x, int y) { return x < y; }"));
+	}
+	
+	@Test
+	public void functionInvocation_IntegerReturnType() throws Exception {
+		accept(	"int func() { return 1; }\n" +
+				"print func()");
+		accept(	"int func() { return 1; }\n" +
+				"b = 5 < func();\n" +
+				"print b");
+		accept(	"int func() { return 1; }\n" +
+				"i = 5 + func();\n" +
+				"print i");
+		accept( "int func() { return func() + 1; }\n" +
+				"print func()");
+		
+		expect(	typeError("func()", new BooleanType(), new IntegerType()),
+				"int func() { return 1; }\n" +
+				"i = func() ? 1 : 2;\n" +
+				"print i");
+		expect(	typeError("func()", new BooleanType(), new IntegerType()),
+				"int func() { return 1; }\n" +
+				"b = !func();\n" +
+				"print b");
+	}
+	
+	@Test
+	public void functionInvocation_BooleanReturnType() throws Exception {
+		accept(	"boolean func() { return 1 < 2; }\n" +
+				"print func()");
+		accept( "boolean func() { return 1 < 2; }\n" +
+				"i = func() ? 1 : 2;\n" +
+				"print i");
+		accept(	"boolean func() { return 1 < 2; }\n" +
+				"b = !func();\n" +
+				"print b");
+		
+		expect(	typeError("func()", new IntegerType(), new BooleanType()),
+				"boolean func() { return 1 < 2; }\n" +
+				"i = 5 + func();\n" +
+				"print i");
+	}
+	
+	@Test
+	public void functionInvocation_Parameters() throws Exception {
+		accept(	"int func(int a){ return a + 1; }\n" +
+				"i = func(1);\n" +
+				"print i");
+		accept( "int func(int a){ return a + 1; }\n" +
+				"i = 5;\n" +
+				"print func(i)");
+		
+		expect(	typeError("1 < 2", new IntegerType(), new BooleanType()),
+				"int func(int a){ return a + 1; }\n" +
+				"i = func(1 < 2);\n" +
+				"print i");
+		
+		accept( "int func(int a, int b){ return a + b; }\n" +
+				"print func(1,2)");
+		accept( "int func(int a, boolean b){ return b ? a : 77; }\n" +
+				"print func(5, 1 < 2)");
+		
+		expect( typeError("1 < 2", new IntegerType(), new BooleanType()),
+				"int func(int a, boolean b){ return 5; }\n" +
+				"print func(1 < 2, 5)");
+	}
 
 	///////////////////////// Helpers /////////////////////////////////////////////
 
@@ -171,5 +251,13 @@ public class TypeCheckTest {
 		" x = " + exp + ";\n" +
 		" print 1";
 	}
-
+	
+	/**
+	 * Generate a test program with a function declaration in it.
+	 */
+	private String progWithFunction(String exp) {
+		return 
+		exp + "\n" +
+		" print 1";
+	}
 }
