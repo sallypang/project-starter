@@ -208,22 +208,21 @@ public class TypeCheckVisitor implements Visitor<Type> {
 
 	@Override
 	public Type visit(FunctionDeclaration decl) {
+		ImpTable<Type> scope = new ImpTable<Type>();
 		// add parameters to scope
 		for(Parameter p : decl.parameters) {
 			try {
-				variables.put(p.name, p.type);
+				scope.put(p.name, p.type);
 			}
 			catch(DuplicateException ex) {
-				// variable shadowing error
+				errors.duplicateDefinition(p.name);
 			}
 		}
 		
-		decl.body.accept(this);
-		check(decl.returnExpression, decl.returnType);
+		TypeCheckVisitor checker = new TypeCheckVisitor(scope, functions, errors);
 		
-		for(Parameter p :decl.parameters) {
-			variables.clear(p.name);
-		}
+		decl.body.accept(checker);
+		checker.check(decl.returnExpression, decl.returnType);
 				
 		return null;
 	}

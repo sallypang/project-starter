@@ -33,10 +33,16 @@ import visitor.DefaultVisitor;
  */
 public class BuildSymbolTableVisitor extends DefaultVisitor<ImpTable<Type>> {
 	
-	private final ImpTable<Type> variables = new ImpTable<Type>();
+	private final ImpTable<Type> variables;
 	private final ErrorReport errors;
 	
 	public BuildSymbolTableVisitor(ErrorReport errors) {
+		variables = new ImpTable<Type>();
+		this.errors = errors;
+	}
+	
+	public BuildSymbolTableVisitor(ImpTable<Type> types, ErrorReport errors) {
+		variables = types;
 		this.errors = errors;
 	}
 
@@ -147,22 +153,21 @@ public class BuildSymbolTableVisitor extends DefaultVisitor<ImpTable<Type>> {
 	// although this doesn't modify the variables list after executing, it 
 	// ensures that the symbols in the body of the function can be resolved 
 	public ImpTable<Type> visit(FunctionDeclaration decl) {
+		ImpTable<Type> scope = new ImpTable<Type>();
+		
 		for(Parameter p : decl.parameters) {
 			try {
-				variables.put(p.name, p.type);
+				scope.put(p.name, p.type);
 			}
 			catch(DuplicateException ex) {
-				// variable shadowing error
+				errors.duplicateDefinition(p.name);
 			}
 		}
 		
-		decl.body.accept(this);
-		decl.returnExpression.accept(this);
-		
-		for(Parameter p :decl.parameters) {
-			// doesn't matter if parameter was shadowed
-			variables.clear(p.name);
-		}	
+		BuildSymbolTableVisitor visitor = new BuildSymbolTableVisitor(scope, errors);
+
+		decl.body.accept(visitor);
+		decl.returnExpression.accept(visitor);
 		
 		return null;
 	}
