@@ -26,6 +26,7 @@ import ast.Type;
 import ast.UnknownType;
 import typechecker.ErrorReport;
 import util.ImpTable;
+import util.ImpTable.DuplicateException;
 import visitor.Visitor;
 
 /**
@@ -53,10 +54,17 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	 * The symbol table from Phase 1. 
 	 */
 	private ImpTable<Type> variables;
+	
+	/**
+	 * The function table computed by phase 2:
+	 */
+	private ImpTable<FunctionDeclaration> functionExps;
 
 
-	public TypeCheckVisitor(ImpTable<Type> variables, ErrorReport errors) {
+	public TypeCheckVisitor(ImpTable<Type> variables, 
+			ImpTable<FunctionDeclaration> functionExps, ErrorReport errors) {
 		this.variables = variables;
+		this.functionExps = functionExps;
 		this.errors = errors;
 	}
 
@@ -202,13 +210,28 @@ public class TypeCheckVisitor implements Visitor<Type> {
 
 	@Override
 	public Type visit(FunctionDeclaration n) {
-		// TODO Auto-generated method stub
+		ImpTable<Type> scope = new ImpTable<Type>();
+
+		for(Param param : n.formal) {
+			try {
+				scope.put(param.name, param.type);
+			} catch (DuplicateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		// Traverse through function tree
+		TypeCheckVisitor checker = new TypeCheckVisitor(scope, this.functionExps, errors);
+		n.assign.accept(checker);
+		checker.check(n.ret, n.type);
+				
 		return null;
 	}
 
 	@Override
 	public Type visit(List<Param> n) {
-		// TODO Auto-generated method stub
+		// Dont't need to do anything here as checked in the above code block.
 		return null;
 	}
 

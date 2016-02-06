@@ -1,5 +1,6 @@
 package typechecker.implementation;
 
+import ast.FunctionDeclaration;
 import ast.Program;
 import ast.Type;
 import typechecker.ErrorReport;
@@ -24,6 +25,11 @@ public class TypeCheckerImplementation extends TypeChecked {
 	 * The symbol table computed by phase 1:
 	 */
 	private ImpTable<Type> variables;
+	
+	/**
+	 * The function table computed by phase 2:
+	 */
+	private ImpTable<FunctionDeclaration> functionExps;
 
 	public TypeCheckerImplementation(Program program) {
 		this.program = program;
@@ -33,7 +39,7 @@ public class TypeCheckerImplementation extends TypeChecked {
 		//Phase 1:
 		variables = buildTable();
 		//Phase 2:
-		program.accept(new TypeCheckVisitor(variables, errors));
+		program.accept(new TypeCheckVisitor(variables, functionExps, errors));
 		//Throw an exception if there were errors:
 		errors.close();
 		// If there was no exception:
@@ -52,7 +58,7 @@ public class TypeCheckerImplementation extends TypeChecked {
 	}
 
 	public ImpTable<Type> typeCheckPhaseTwo() throws TypeCheckerException {
-		program.accept(new TypeCheckVisitor(variables, errors));
+		program.accept(new TypeCheckVisitor(variables, functionExps, errors));
 		errors.close();
 		return variables;
 	}
