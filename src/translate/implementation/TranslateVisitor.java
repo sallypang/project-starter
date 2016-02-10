@@ -247,7 +247,27 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	
 	@Override
 	public TRExp visit(FunctionDeclaration functionDeclaration) {
-		// TODO For project 2
+		Frame oldFrame = frame;
+		FunTable<Access> oldEnv = currentEnv;
+		
+		frame = newFrame(Label.get(FUNCTION_PREFIX + functionDeclaration.name), functionDeclaration.parameters.size());
+		currentEnv = FunTable.theEmpty();
+		int index = 0;
+		for(ast.Parameter param : functionDeclaration.parameters){
+			putEnv(param.name, frame.getFormal(index++));
+		}
+		
+		TRExp statements = functionDeclaration.body.accept(this);
+		TRExp ret = functionDeclaration.returnExpression.accept(this);
+		IRStm body = IR.SEQ(
+				statements.unNx(),
+				ret.unNx());
+		
+		frags.add(new ProcFragment(frame, frame.procEntryExit1(body)));
+		
+		currentEnv = oldEnv;
+		frame = oldFrame;
+		
 		return null;
 	}
 
