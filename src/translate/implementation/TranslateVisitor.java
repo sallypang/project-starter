@@ -8,6 +8,10 @@ import static ir.tree.IR.SEQ;
 import static ir.tree.IR.TEMP;
 import static ir.tree.IR.TRUE;
 import static translate.Translator.L_MAIN;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import ast.AST;
 import ast.Assign;
 import ast.BooleanType;
@@ -34,6 +38,7 @@ import ir.frame.Frame;
 import ir.temp.Label;
 import ir.temp.Temp;
 import ir.tree.IR;
+import ir.tree.IRExp;
 import ir.tree.IRStm;
 import ir.tree.TEMP;
 import ir.tree.BINOP.Op;
@@ -220,13 +225,26 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		TRExp t = n.e2.accept(this);
 		TRExp f = n.e3.accept(this);
 
+		Label trueLabel = Label.gen(), falseLabel = Label.gen(), endLabel = Label.gen(); 
+		
 		TEMP v = TEMP(new Temp());
-		return new Ex(ESEQ( SEQ( 
+		/*return new Ex(ESEQ( SEQ( 
 				MOVE(v, f.unEx()),
 				CMOVE(RelOp.EQ, c.unEx(), TRUE, v, t.unEx())),
+				v));*/
+		return new Ex(ESEQ( SEQ(
+				IR.CJUMP(RelOp.EQ, c.unEx(), TRUE, trueLabel, falseLabel),
+				IR.LABEL(falseLabel),
+				IR.MOVE(v, f.unEx()),
+				IR.JUMP(endLabel),
+				IR.LABEL(trueLabel),
+				IR.MOVE(v, t.unEx()),
+				IR.LABEL(endLabel)),
 				v));
 	}
 
+	private final static String FUNCTION_PREFIX = "Function::";
+	
 	@Override
 	public TRExp visit(FunctionDeclaration functionDeclaration) {
 		// TODO For project 2
@@ -235,7 +253,12 @@ public class TranslateVisitor implements Visitor<TRExp> {
 
 	@Override
 	public TRExp visit(FunctionInvocation functionInvocation) {
-		// TODO For project 2
-		return null;
+		Label label = Label.get(FUNCTION_PREFIX + functionInvocation.name);
+		
+		util.List<IRExp> args = util.List.list();
+		for(Expression e : functionInvocation.arguments)
+			args.add(e.accept(this).unEx());
+		
+		return new Ex(IR.CALL(label, args));
 	}
 }
