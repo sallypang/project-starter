@@ -261,14 +261,16 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		TRExp ret = functionDeclaration.returnExpression.accept(this);
 		IRStm body = IR.SEQ(
 				statements.unNx(),
-				ret.unNx());
+				IR.MOVE(
+					frame.RV(), 
+					ret.unEx()));
 		
 		frags.add(new ProcFragment(frame, frame.procEntryExit1(body)));
 		
 		currentEnv = oldEnv;
 		frame = oldFrame;
 		
-		return null;
+		return new Nx(IR.NOP);
 	}
 
 	@Override

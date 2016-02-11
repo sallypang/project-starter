@@ -107,6 +107,42 @@ public class TestTranslate {
 		);
 	}
 	
+	@Test
+	public void func() throws Exception {
+		test(	"1\n",
+				"int func() {\n" +
+				"	return 1;\n" +
+				"}\n" +
+				"print func()");		
+	}
+	
+	@Test
+	public void fibFunc() throws Exception {
+		String fibFunc = 
+				"int fib(int n) {\n" +
+				"	return n < 2 ? 1 : fib(n-1) + fib(n-2);\n" +
+				"}\n";
+		
+		test(	"1\n",
+				fibFunc +
+				"print fib(0)");
+		test(	"1\n",
+				fibFunc +
+				"print fib(1)");
+		test(	"2\n",
+				fibFunc +
+				"print fib(2)");
+		test(	"3\n",
+				fibFunc +
+				"print fib(3)");
+		test(	"5\n",
+				fibFunc +
+				"print fib(4)");
+		test(	"8\n",
+				fibFunc +
+				"print fib(5)");
+	}
+	
 //	@Test public void complexBranches() throws Exception {
 //		//Trying to create a program that has many choices... so many traces.
 //		//We want to work the trace schedule to a point where it actually 
