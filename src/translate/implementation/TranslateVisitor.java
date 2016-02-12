@@ -37,6 +37,7 @@ import ir.temp.Temp;
 import ir.tree.IR;
 import ir.tree.IRExp;
 import ir.tree.IRStm;
+import ir.tree.MEM;
 import ir.tree.TEMP;
 import ir.tree.BINOP.Op;
 import ir.tree.CJUMP.RelOp;
@@ -46,6 +47,7 @@ import translate.ProcFragment;
 import translate.Translator;
 import util.FunTable;
 import util.ImpTable;
+import util.ImpTable.DuplicateException;
 import util.List;
 import util.Lookup;
 import visitor.Visitor;
@@ -158,11 +160,16 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		if(!inFunction && n.value instanceof IntegerLiteral){
 			IntegerLiteral literal = (IntegerLiteral)n.value;
 			
-			Label l = Label.gen();	
+			Label l = Label.gen();
 			frags.add(new DataFragment(frame, IR.DATA(l, List.list(IR.CONST(literal.value)))));
-			val = new Ex(IR.MEM(IR.NAME(l)));
+			MEM mem = IR.MEM(IR.NAME(l));
+			val = new Ex(mem);
 			
-			constants.put(n.name, val);
+			try {
+				constants.put(n.name, mem);
+			} catch (DuplicateException e) {
+				// don't do anything for this case
+			}
 		}
 		else
 			val = n.value.accept(this);
@@ -208,20 +215,22 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	//////////////////////////////////////////////////////////////////
 
 	@Override
+	// don't do constant processing here since all operations supported
+	// in Expressions + Functions can have imm8/16/32 operands (see opcodes 80h, 81h, and 83h)
 	public TRExp visit(IntegerLiteral n) {
-		if(inFunction) {
-			TEMP v = TEMP(new Temp());
-			return new Ex(IR.ESEQ(IR.MOVE(v, IR.CONST(n.value)), v));
-		}
-		else {
-			
-		}
+		return new Ex(IR.CONST(n.value));
 	}
 
 	@Override
 	public TRExp visit(IdentifierExp n) {
-		Access var = currentEnv.lookup(n.name);
-		return new Ex(var.exp(frame.FP()));
+		IRExp constant = constants.lookup(n.name);
+		if(constant != null) {
+			return new Ex(constant);
+		}
+		else {
+			Access var = currentEnv.lookup(n.name);
+			return new Ex(var.exp(frame.FP()));
+		}
 	}
 
 	@Override
