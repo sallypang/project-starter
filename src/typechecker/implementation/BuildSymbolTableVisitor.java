@@ -1,5 +1,7 @@
 package typechecker.implementation;
 
+import java.util.Map.Entry;
+
 import ast.AST;
 import ast.Assign;
 import ast.BooleanType;
@@ -161,6 +163,15 @@ public class BuildSymbolTableVisitor extends DefaultVisitor<ImpTable<Type>> {
 			}
 			catch(DuplicateException ex) {
 				errors.duplicateDefinition(p.name);
+			}
+		}
+		
+		for(Entry<String, Type> kvp : variables){
+			try {
+				scope.put(kvp.getKey(), kvp.getValue());
+			}
+			catch(DuplicateException ex) {
+				errors.duplicateDefinition(kvp.getKey());
 			}
 		}
 		

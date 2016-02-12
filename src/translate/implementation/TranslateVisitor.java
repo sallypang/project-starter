@@ -9,9 +9,6 @@ import static ir.tree.IR.TEMP;
 import static ir.tree.IR.TRUE;
 import static translate.Translator.L_MAIN;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ast.AST;
 import ast.Assign;
 import ast.BooleanType;
@@ -43,11 +40,13 @@ import ir.tree.IRStm;
 import ir.tree.TEMP;
 import ir.tree.BINOP.Op;
 import ir.tree.CJUMP.RelOp;
-
+import translate.DataFragment;
 import translate.Fragments;
 import translate.ProcFragment;
 import translate.Translator;
 import util.FunTable;
+import util.ImpTable;
+import util.List;
 import util.Lookup;
 import visitor.Visitor;
 
@@ -77,10 +76,16 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	private Frame frameFactory;
 	private Frame frame;
 	private FunTable<Access> currentEnv;
+	private ImpTable<IRExp> constants;
 
+	private boolean inFunction;
+	
 	public TranslateVisitor(Lookup<Type> table, Frame frameFactory) {
 		this.frags = new Fragments(frameFactory);
 		this.frameFactory = frameFactory;
+		
+		inFunction = false;
+		constants = new ImpTable<IRExp>();
 	}
 
 	/////// Helpers //////////////////////////////////////////////
@@ -147,7 +152,21 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	public TRExp visit(Assign n) {
 		Access var = frame.allocLocal(false);
 		putEnv(n.name, var);
-		TRExp val = n.value.accept(this);
+		TRExp val;
+		
+		// keep track of global constants
+		if(!inFunction && n.value instanceof IntegerLiteral){
+			IntegerLiteral literal = (IntegerLiteral)n.value;
+			
+			Label l = Label.gen();	
+			frags.add(new DataFragment(frame, IR.DATA(l, List.list(IR.CONST(literal.value)))));
+			val = new Ex(IR.MEM(IR.NAME(l)));
+			
+			constants.put(n.name, val);
+		}
+		else
+			val = n.value.accept(this);
+		
 		return new Nx(IR.MOVE(var.exp(frame.FP()), val.unEx()));
 	}
 
@@ -190,7 +209,13 @@ public class TranslateVisitor implements Visitor<TRExp> {
 
 	@Override
 	public TRExp visit(IntegerLiteral n) {
-		return new Ex(IR.CONST(n.value));
+		if(inFunction) {
+			TEMP v = TEMP(new Temp());
+			return new Ex(IR.ESEQ(IR.MOVE(v, IR.CONST(n.value)), v));
+		}
+		else {
+			
+		}
 	}
 
 	@Override
@@ -251,7 +276,9 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		FunTable<Access> oldEnv = currentEnv;
 		
 		frame = newFrame(Label.get(FUNCTION_PREFIX + functionDeclaration.name), functionDeclaration.parameters.size());
-		currentEnv = FunTable.theEmpty();
+		currentEnv = FunTable.<Access>theEmpty().merge(oldEnv);
+		inFunction = true;
+		
 		int index = 0;
 		for(ast.Parameter param : functionDeclaration.parameters){
 			putEnv(param.name, frame.getFormal(index++));
@@ -267,6 +294,7 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		
 		frags.add(new ProcFragment(frame, frame.procEntryExit1(body)));
 		
+		inFunction = false;
 		currentEnv = oldEnv;
 		frame = oldFrame;
 		

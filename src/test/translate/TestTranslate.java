@@ -143,6 +143,16 @@ public class TestTranslate {
 				"print fib(5)");
 	}
 	
+	@Test
+	public void globalFunc() throws Exception {
+		test(	"3\n",
+				"a = 3;\n" +
+				"int func() {\n" +
+				"	return a;\n" +
+				"}\n" +
+				"print func()");
+	}
+	
 //	@Test public void complexBranches() throws Exception {
 //		//Trying to create a program that has many choices... so many traces.
 //		//We want to work the trace schedule to a point where it actually 

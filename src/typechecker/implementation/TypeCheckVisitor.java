@@ -3,6 +3,7 @@ package typechecker.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import ast.AST;
 import ast.Assign;
@@ -219,6 +220,15 @@ public class TypeCheckVisitor implements Visitor<Type> {
 			}
 		}
 		
+		for(Entry<String, Type> kvp : variables){
+			try {
+				scope.put(kvp.getKey(), kvp.getValue());
+			}
+			catch(DuplicateException ex) {
+				errors.duplicateDefinition(kvp.getKey());
+			}
+		}
+		
 		TypeCheckVisitor checker = new TypeCheckVisitor(scope, functions, errors);
 		
 		decl.body.accept(checker);
@@ -232,7 +242,7 @@ public class TypeCheckVisitor implements Visitor<Type> {
 		FunctionDeclaration decl = functions.lookup(call.name);
 		if(decl.parameters.size() != call.arguments.size()) {
 			// add arity error here
-			return null;
+			return new UnknownType();
 		}
 		
 		// check that each argument against parameter type
