@@ -2,8 +2,10 @@ package typechecker.implementation;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import ast.AST;
 import ast.Assign;
@@ -59,12 +61,13 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	 */
 	private ImpTable<Type> variables;
 	private ImpTable<FunctionDeclaration> functions;
-
+	private ImpTable<Type> constants;
 
 	public TypeCheckVisitor(ImpTable<Type> variables, ImpTable<FunctionDeclaration> functions, ErrorReport errors) {
 		this.variables = variables;
 		this.errors = errors;
 		this.functions = functions;
+		constants = new ImpTable<Type>();
 	}
 
 	//// Helpers /////////////////////
@@ -141,6 +144,11 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	@Override
 	public Type visit(Assign n) {
 		Type expressionType = n.value.accept(this);
+		
+		if(n.value instanceof IntegerLiteral){
+			constants.set(n.name, expressionType);
+		}
+		
 		variables.set(n.name, expressionType);
 		return null; 
 	}
@@ -195,8 +203,10 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	@Override
 	public Type visit(IdentifierExp n) {
 		Type type = variables.lookup(n.name);
-		if (type == null) 
+		if (type == null) {
+			errors.undefinedId(n.name);
 			type = new UnknownType();
+		}
 		return type;
 	}
 
@@ -220,7 +230,7 @@ public class TypeCheckVisitor implements Visitor<Type> {
 			}
 		}
 		
-		for(Entry<String, Type> kvp : variables){
+		for(Entry<String, Type> kvp : constants){
 			try {
 				scope.put(kvp.getKey(), kvp.getValue());
 			}
