@@ -183,11 +183,11 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	
 	// checks if an expression can be put directly into data without causing issues with the linearizer
 	private boolean Trivial(Expression exp) {
-		return 
-				(exp instanceof IntegerLiteral) ||
-				(exp instanceof Plus) ||
-				(exp instanceof Minus) ||
-				(exp instanceof Times);
+		return !(
+					(exp instanceof LessThan) ||
+					(exp instanceof Not) ||
+					(exp instanceof Conditional));
+				
 	}
 
 	@Override
