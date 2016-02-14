@@ -153,6 +153,36 @@ public class TestTranslate {
 				"print func()");
 	}
 	
+	@Test
+	public void piazzaTest1() throws Exception {
+		test(	"5\n",
+				"x = 2 < 3;\n" +
+				"int foo() {\n" +
+				"	return x? 5 : 10;\n" +
+				"}\n" +
+				"print foo()");
+	}
+	
+	@Test
+	public void piazzaTest2() throws Exception {
+		test(	"5\n",
+				"y = 5;\n" +
+				"x = 2 < y;\n" +
+				"int foo() {\n" +
+				"  return x? 5 : 10;\n" +
+				"}\n" +
+				"print foo()");
+	}
+	
+	@Test
+	public void piazzaTest3() throws Exception {
+		test(	"2\n",
+				"int y() { return 1; }\n" +
+				"x = y();\n" +						
+				"int z() { return x+1; }\n" +
+				"print z()");
+	}
+	
 //	@Test public void complexBranches() throws Exception {
 //		//Trying to create a program that has many choices... so many traces.
 //		//We want to work the trace schedule to a point where it actually 

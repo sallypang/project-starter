@@ -78,7 +78,7 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	private Frame frameFactory;
 	private Frame frame;
 	private FunTable<Access> currentEnv;
-	private ImpTable<IRExp> constants;
+	private ImpTable<TRExp> globals;
 
 	private boolean inFunction;
 	
@@ -87,7 +87,7 @@ public class TranslateVisitor implements Visitor<TRExp> {
 		this.frameFactory = frameFactory;
 		
 		inFunction = false;
-		constants = new ImpTable<IRExp>();
+		globals = new ImpTable<TRExp>();
 	}
 
 	/////// Helpers //////////////////////////////////////////////
@@ -154,27 +154,40 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	public TRExp visit(Assign n) {
 		Access var = frame.allocLocal(false);
 		putEnv(n.name, var);
-		TRExp val;
+		TRExp val = n.value.accept(this);
 		
 		// keep track of global constants
-		if(!inFunction && n.value instanceof IntegerLiteral){
-			IntegerLiteral literal = (IntegerLiteral)n.value;
-			
+		if(!inFunction){
 			Label l = Label.gen();
-			frags.add(new DataFragment(frame, IR.DATA(l, List.list(IR.CONST(literal.value)))));
 			MEM mem = IR.MEM(IR.NAME(l));
-			val = new Ex(mem);
 			
-			try {
-				constants.put(n.name, mem);
-			} catch (DuplicateException e) {
-				// don't do anything for this case
+			
+			if(Trivial(n.value)) {
+				frags.add(new DataFragment(frame, IR.DATA(l, List.list(val.unEx()))));
+				val = new Ex(mem);
 			}
+			else {
+				frags.add(new DataFragment(frame, IR.DATA(l, List.list(IR.CONST(0)))));
+				val = new Ex(
+						ESEQ( 
+							SEQ(
+								IR.MOVE(mem, val.unEx())),
+						mem));
+			}			
+			
+			globals.set(n.name, new Ex(mem));
 		}
-		else
-			val = n.value.accept(this);
 		
 		return new Nx(IR.MOVE(var.exp(frame.FP()), val.unEx()));
+	}
+	
+	// checks if an expression can be put directly into data without causing issues with the linearizer
+	private boolean Trivial(Expression exp) {
+		return 
+				(exp instanceof IntegerLiteral) ||
+				(exp instanceof Plus) ||
+				(exp instanceof Minus) ||
+				(exp instanceof Times);
 	}
 
 	@Override
@@ -215,17 +228,15 @@ public class TranslateVisitor implements Visitor<TRExp> {
 	//////////////////////////////////////////////////////////////////
 
 	@Override
-	// don't do constant processing here since all operations supported
-	// in Expressions + Functions can have imm8/16/32 operands (see opcodes 80h, 81h, and 83h)
 	public TRExp visit(IntegerLiteral n) {
 		return new Ex(IR.CONST(n.value));
 	}
 
 	@Override
 	public TRExp visit(IdentifierExp n) {
-		IRExp constant = constants.lookup(n.name);
+		TRExp constant = globals.lookup(n.name);
 		if(constant != null) {
-			return new Ex(constant);
+			return constant;
 		}
 		else {
 			Access var = currentEnv.lookup(n.name);

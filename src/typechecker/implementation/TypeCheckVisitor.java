@@ -61,13 +61,11 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	 */
 	private ImpTable<Type> variables;
 	private ImpTable<FunctionDeclaration> functions;
-	private ImpTable<Type> constants;
 
 	public TypeCheckVisitor(ImpTable<Type> variables, ImpTable<FunctionDeclaration> functions, ErrorReport errors) {
 		this.variables = variables;
 		this.errors = errors;
 		this.functions = functions;
-		constants = new ImpTable<Type>();
 	}
 
 	//// Helpers /////////////////////
@@ -144,10 +142,6 @@ public class TypeCheckVisitor implements Visitor<Type> {
 	@Override
 	public Type visit(Assign n) {
 		Type expressionType = n.value.accept(this);
-		
-		if(n.value instanceof IntegerLiteral){
-			constants.set(n.name, expressionType);
-		}
 		
 		variables.set(n.name, expressionType);
 		return null; 
@@ -230,7 +224,8 @@ public class TypeCheckVisitor implements Visitor<Type> {
 			}
 		}
 		
-		for(Entry<String, Type> kvp : constants){
+		// all global variables are added to this scope
+		for(Entry<String, Type> kvp : variables){
 			try {
 				scope.put(kvp.getKey(), kvp.getValue());
 			}
